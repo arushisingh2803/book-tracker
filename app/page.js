@@ -11,11 +11,13 @@ import {
   deleteDoc,
   getDoc,
 } from 'firebase/firestore'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 export default function Home() {
   const [inventory, setInventory] = useState([])
   const [open, setOpen] = useState(false)
   const [itemName, setItemName] = useState('')
+  const [hasMore, setHasMore] = useState(true)
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'))
@@ -64,6 +66,16 @@ export default function Home() {
     }
   }
 
+  const fetchMoreData = () => {
+    if (inventory.length >= 50) { 
+      setHasMore(false)
+      return
+    }
+    setTimeout(() => {
+      updateInventory()
+    }, 1500)
+  }
+
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)    
   return (
@@ -91,23 +103,37 @@ export default function Home() {
       </div>
 
       <div className="flex-grow flex flex-col items-center mt-4 px-4 md:px-8">
-        <div className="bg-white w-full max-w-6xl h-96 flex flex-col items-center shadow-md p-5">
+        <div className="bg-white w-full max-w-6xl h-96 flex flex-col items-center shadow-md p-5 overflow-hidden">
           <p className="text-center mb-4 text-amber-950">your pantry</p>
-          <div className="bg-orange-100 w-full h-full flex items-center justify-center">
-          {inventory.length === 0 ? (
-              <p className="text-gray-600">No items in pantry.</p>
-            ) : (
-              inventory.map((item) => (
-                <div key={item.name} className="flex justify-between w-full px-4 py-2 border-b border-gray-200">
-                  <span className="text-gray-800">{item.name} (Quantity: {item.quantity})</span>
-                  <button
-                    onClick={() => removeItem(item.name)}
-                    className="text-red-600 hover:text-red-800">
-                      Remove
-                  </button>
-                </div>
-              ))
-            )}
+          <div className="bg-orange-100 w-full h-full overflow-auto">
+            <InfiniteScroll
+              dataLength={inventory.length}
+              next={fetchMoreData}
+              hasMore={hasMore}
+              className="w-full"
+            >
+              {inventory.length === 0 ? (
+                <p className="text-gray-600 text-center mt-4">No items in pantry.</p>
+              ) : (
+                inventory.map((item) => (
+                  <div key={item.name} className="flex justify-between px-4 py-1 border-b border-gray-200">
+                    <span className="text-gray-800">{item.name} (Quantity: {item.quantity})</span>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => addItem(item.name)}
+                        className="bg-white px-2 py-1 rounded">
+                        ➕
+                      </button>
+                      <button
+                        onClick={() => removeItem(item.name)}
+                        className="bg-white px-2 py-1 rounded">
+                        ❌
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </InfiniteScroll>
           </div>
         </div>
       </div>
