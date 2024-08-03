@@ -75,9 +75,7 @@ export default function Home() {
       updateInventory()
     }, 1500)
   }
-
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)    
+ 
   return (
     <div className="flex flex-col min-h-screen bg-orange-200 font-mono">
       
@@ -102,7 +100,7 @@ export default function Home() {
         </form>
       </div>
 
-      <div className="flex-grow flex flex-col items-center mt-4 px-4 md:px-8">
+      <div className="flex-grow flex flex-col items-center mt-4 px-4 md:px-8 pb-5">
         <div className="bg-white w-full max-w-6xl h-96 flex flex-col items-center shadow-md p-5 overflow-hidden">
           <p className="text-center mb-4 text-amber-950">your pantry</p>
           <div className="bg-orange-100 w-full h-full overflow-auto">
@@ -138,11 +136,19 @@ export default function Home() {
         </div>
       </div>
 
-      <footer className="bg-orange-200 text-center py-4 border-t border-amber-950">
+      <div className="w-full flex justify-center mt-4">
+          <button
+            className="bg-amber-900 text-white px-4 py-2 rounded shadow-md">
+            Find Recipe!
+          </button>
+      </div>
+      
+
+      <footer className="bg-orange-200 text-center py-4 pt-10">
         <p className="text-amber-950 text-sm">
           &copy; {new Date().getFullYear()} Arushi Singh. All rights reserved.
         </p>
-        <p className="text-amber-950 text-xs mt-1">Made with love and NextJS, Firebase and Tailwind CSS</p>
+        <p className="text-amber-950 text-xs mt-1">Made with love and NextJS, Firebase and Tailwind CSS. Integrates OpenAI to find recipes :)</p>
       </footer>
     </div>
   );
