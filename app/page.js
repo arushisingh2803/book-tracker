@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { firestore } from '@/firebase'
+import { useState, useEffect } from 'react';
+import { firestore } from '@/firebase';
 import {
   collection,
   doc,
@@ -10,75 +10,75 @@ import {
   setDoc,
   deleteDoc,
   getDoc,
-} from 'firebase/firestore'
-import InfiniteScroll from 'react-infinite-scroll-component'
+} from 'firebase/firestore';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function Home() {
-  const [inventory, setInventory] = useState([])
-  const [open, setOpen] = useState(false)
-  const [itemName, setItemName] = useState('')
-  const [hasMore, setHasMore] = useState(true)
+  const [inventory, setInventory] = useState([]);
+  const [itemName, setItemName] = useState('');
+  const [hasMore, setHasMore] = useState(true);
+  const [recipes, setRecipes] = useState([]);
 
   const updateInventory = async () => {
-    const snapshot = query(collection(firestore, 'inventory'))
-    const docs = await getDocs(snapshot)
-    const inventoryList = []
+    const snapshot = query(collection(firestore, 'inventory'));
+    const docs = await getDocs(snapshot);
+    const inventoryList = [];
     docs.forEach((doc) => {
-      inventoryList.push({ name: doc.id, ...doc.data() })
-    })
-    setInventory(inventoryList)
-  }
+      inventoryList.push({ name: doc.id, ...doc.data() });
+    });
+    setInventory(inventoryList);
+  };
+
   const addItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item)
-    const docSnap = await getDoc(docRef)
+    const docRef = doc(collection(firestore, 'inventory'), item);
+    const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      await setDoc(docRef, { quantity: quantity + 1 })
+      const { quantity } = docSnap.data();
+      await setDoc(docRef, { quantity: quantity + 1 });
     } else {
-      await setDoc(docRef, { quantity: 1 })
+      await setDoc(docRef, { quantity: 1 });
     }
-    await updateInventory()
-  }
-  
+    await updateInventory();
+  };
+
   const removeItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item)
-    const docSnap = await getDoc(docRef)
+    const docRef = doc(collection(firestore, 'inventory'), item);
+    const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
+      const { quantity } = docSnap.data();
       if (quantity === 1) {
-        await deleteDoc(docRef)
+        await deleteDoc(docRef);
       } else {
-        await setDoc(docRef, { quantity: quantity - 1 })
+        await setDoc(docRef, { quantity: quantity - 1 });
       }
     }
-    await updateInventory()
-  }
-  
+    await updateInventory();
+  };
+
   useEffect(() => {
-    updateInventory()
-  }, [])
+    updateInventory();
+  }, []);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (itemName.trim() !== '') {
-      addItem(itemName)
-      setItemName('')
+      addItem(itemName);
+      setItemName('');
     }
-  }
+  };
 
   const fetchMoreData = () => {
-    if (inventory.length >= 50) { 
-      setHasMore(false)
-      return
+    if (inventory.length >= 50) {
+      setHasMore(false);
+      return;
     }
     setTimeout(() => {
-      updateInventory()
-    }, 1500)
-  }
- 
+      updateInventory();
+    }, 1500);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-orange-200 font-mono">
-      
       <div className="w-full fixed top-0 bg-orange-200 z-10 flex justify-center items-center p-4">
         <div className="max-w-3xl w-full flex justify-center">
           <h1 className="text-4xl text-center p-5 text-amber-950">pantry tracker</h1>
@@ -136,19 +136,11 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="w-full flex justify-center mt-4">
-          <button
-            className="bg-amber-900 text-white px-4 py-2 rounded shadow-md">
-            Find Recipe!
-          </button>
-      </div>
-      
-
       <footer className="bg-orange-200 text-center py-4 pt-10">
         <p className="text-amber-950 text-sm">
           &copy; {new Date().getFullYear()} Arushi Singh. All rights reserved.
         </p>
-        <p className="text-amber-950 text-xs mt-1">Made with love and NextJS, Firebase and Tailwind CSS. Integrates OpenAI to find recipes :)</p>
+        <p className="text-amber-950 text-xs mt-1">Made with love and NextJS, Firebase and Tailwind CSS.</p>
       </footer>
     </div>
   );
